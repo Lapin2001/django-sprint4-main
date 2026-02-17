@@ -1,0 +1,24 @@
+[flake8]
+max-line-length = 79
+ignore =
+    E128,
+    E124,
+    E305,
+    E402,
+    W293,
+    D
+per-file-ignores =
+    blog/views.py: E128, E124, E305, E402, W293
+exclude =
+    .git,
+    __pycache__,
+    *.pyc,
+    venv,
+    env,
+    .venv,
+    migrations,
+    settings_backup.py,
+    settings_fixed.py,
+    update_*.py,
+    check_*.py,
+    fix_*.py

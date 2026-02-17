@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3>Подтверждение удаления комментария</h3>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            Вы уверены, что хотите удалить этот комментарий?
+          </p>
+          <div class="alert alert-secondary">
+            {{ comment.text }}
+          </div>
+          <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+              Удалить
+            </button>
+            <a href="{% url 'blog:post_detail' post.id %}" class="btn btn-secondary">
+              Отмена
+            </a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

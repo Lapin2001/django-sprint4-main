@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<article class="blog-post">
+    <h1 class="mb-3">{{ post.title }}</h1>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a href="{% url 'blog:profile' username=post.author.username %}" class="text-decoration-none fw-bold">
+                {{ post.author.get_full_name|default:post.author.username }}
+            </a>
+            <span class="text-muted ms-2">• {{ post.pub_date|date:"d E Y, H:i" }}</span>
+        </div>
+        <div>
+            <span class="badge bg-primary">{{ post.category.title }}</span>
+            {% if post.location %}
+            <span class="badge bg-secondary">{{ post.location.name }}</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if post.image %}
+    <div class="mb-4">
+        <img src="{{ post.image.url }}" class="img-fluid rounded" alt="{{ post.title }}">
+    </div>
+    {% endif %}
+    
+    <div class="mb-4">
+        {{ post.text|linebreaks }}
+    </div>
+    
+    <!-- Действия с постом (для автора) -->
+    {% if user == post.author %}
+    <div class="border-top pt-3 mb-4">
+        <h5>Действия с записью:</h5>
+        <div class="btn-group" role="group">
+            <a href="{% url 'blog:edit_post' post_id=post.id %}" class="btn btn-outline-primary">
+                Редактировать
+            </a>
+            <a href="{% url 'blog:delete_post' post_id=post.id %}" class="btn btn-outline-danger">
+                Удалить
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Комментарии -->
+    <div class="border-top pt-4">
+        <h4 class="mb-3">Комментарии ({{ comments.count }})</h4>
+        
+        <!-- Форма добавления комментария -->
+        {% if user.is_authenticated %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="post" action="{% url 'blog:add_comment' post_id=post.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_text" class="form-label">Добавить комментарий</label>
+                        <textarea name="text" id="id_text" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.
+        </div>
+        {% endif %}
+        
+        <!-- Список комментариев -->
+        {% if comments %}
+        <div class="list-group">
+            {% for comment in comments %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="me-auto">
+                        <div class="fw-bold">
+                            <a href="{% url 'blog:profile' username=comment.author.username %}" class="text-decoration-none">
+                                {{ comment.author.get_full_name|default:comment.author.username }}
+                            </a>
+                        </div>
+                        <p class="mb-1">{{ comment.text }}</p>
+                        <small class="text-muted">{{ comment.created_at|date:"d E Y, H:i" }}</small>
+                    </div>
+                    {% if user == comment.author %}
+                    <div class="btn-group btn-group-sm">
+                        <a href="{% url 'blog:edit_comment' post_id=post.id comment_id=comment.id %}" 
+                           class="btn btn-outline-secondary">✏️</a>
+                        <a href="{% url 'blog:delete_comment' post_id=post.id comment_id=comment.id %}" 
+                           class="btn btn-outline-danger">🗑️</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-light text-center">
+            Пока нет комментариев. Будьте первым!
+        </div>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}
