@@ -2,13 +2,21 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
+from django.db.models import Count  # Добавьте этот импорт
 
 from .forms import CommentForm, PostForm
 from .models import Category, Comment, Post
 
 
 def index(request):
-    post_list = Post.objects.filter(is_published=True).order_by('-pub_date')
+    # Добавляем аннотацию с количеством комментариев
+    post_list = Post.objects.filter(
+        is_published=True,
+        category__is_published=True  # Добавьте эту фильтрацию
+    ).annotate(
+        comment_count=Count('comments')  # Считаем комментарии
+    ).order_by('-pub_date')
+
     paginator = Paginator(post_list, 10)  # 10 постов на странице
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -16,7 +24,14 @@ def index(request):
 
 
 def post_detail(request, post_id):
-    post = get_object_or_404(Post, id=post_id, is_published=True)
+    # Добавляем аннотацию и для детальной страницы
+    post = get_object_or_404(
+        Post.objects.annotate(
+            comment_count=Count('comments')
+        ), 
+        id=post_id, 
+        is_published=True
+    )
     comments = Comment.objects.filter(post=post).order_by('created_at')
     form = CommentForm()
 
@@ -31,7 +46,13 @@ def post_detail(request, post_id):
 
 def category_posts(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug, is_published=True)
-    post_list = Post.objects.filter(category=category, is_published=True).order_by('-pub_date')
+    post_list = Post.objects.filter(
+        category=category, 
+        is_published=True
+    ).annotate(
+        comment_count=Count('comments')  # Добавляем аннотацию
+    ).order_by('-pub_date')
+
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -40,7 +61,10 @@ def category_posts(request, category_slug):
 
 def profile(request, username):
     user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=user).order_by('-pub_date')
+    posts = Post.objects.filter(author=user).annotate(
+        comment_count=Count('comments')  # Добавляем аннотацию
+    ).order_by('-pub_date')
+
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
