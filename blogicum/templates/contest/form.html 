@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  Подать заявку на конкурс
+{% endblock %}
+
+{% block content %}
+  <div class="card col-md-4">
+    <div class="card-header">
+      <h4 class="card-title mb-0">Конкурс мороженого</h4>
+    </div>
+    <div class="card-body">
+      <form method="get">
+        {% csrf_token %}
+        {% bootstrap_form form layout='vertical' %}
+        <button type="submit" class="btn btn-primary w-100 mt-3">
+          Отправить
+        </button>
+      </form>
+    </div>
+  </div>
+
+  {% if form.is_valid %}
+    <div class="row justify-content-center mt-4">
+      <div class="col-md-6">
+        <div class="alert alert-success text-center">
+          <h2>Рецепт мороженого "{{ request.GET.title }}" принят на конкурс!</h2>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

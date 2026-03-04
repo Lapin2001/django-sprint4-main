@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наши правила</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .rules-list {
+            margin-left: 20px;
+        }
+        .rules-list li {
+            margin-bottom: 10px;
+        }
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Наши правила</h1>
+    
+    <div class="content">
+        <h2>Правила сообщества Блогикум</h2>
+        
+        <ol class="rules-list">
+            <li><strong>Уважайте других пользователей</strong> - не допускаются оскорбления, угрозы или дискриминация.</li>
+            <li><strong>Качественный контент</strong> - публикуйте полезные и интересные материалы.</li>
+            <li><strong>Авторское право</strong> - не публикуйте чужие материалы без разрешения.</li>
+            <li><strong>Спам запрещён</strong> - не размещайте рекламные сообщения без согласования.</li>
+            <li><strong>Конфиденциальность</strong> - не разглашайте личную информацию других пользователей.</li>
+            <li><strong>Тематика</strong> - публикации должны соответствовать тематике платформы.</li>
+            <li><strong>Модерация</strong> - администраторы оставляют за собой право удалять неподходящий контент.</li>
+        </ol>
+        
+        <p>Соблюдение этих правил помогает поддерживать дружественную атмосферу в сообществе.</p>
+    </div>
+    
+    <a href="{% url 'blog:index' %}" class="btn-back">На главную</a>
+</body>
+</html>

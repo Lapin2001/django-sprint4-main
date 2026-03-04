@@ -1,0 +1,18 @@
+<ul class="dropdown-menu">
+    {% if user.is_authenticated %}
+    <li>
+        <a class="dropdown-item" href="{% url 'blog:profile' username=user.username %}">
+            Мой профиль
+        </a>
+    </li>
+    <li><hr class="dropdown-divider"></li>
+    <li>
+        <form method="post" action="{% url 'logout' %}" class="dropdown-item p-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link text-decoration-none p-0 w-100 text-start">
+                Выйти
+            </button>
+        </form>
+    </li>
+    {% endif %}
+</ul>
