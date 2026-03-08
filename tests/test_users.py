@@ -141,23 +141,33 @@ def get_extra_urls(
     find_links_kwargs = dict(
         urls_start_with="", start_lineix=-1, end_lineix=-1
     )
-    user_links = set(
-    print("\n=== ССЫЛКИ У ВЛАДЕЛЬЦА ===")
-    for link in sorted(user_links):
-        print(f"  - {link}")
-    print("\n=== ССЫЛКИ У ДРУГОГО ===")
-    for link in sorted(another_links):
-        print(f"  - {link}")
-        find_links_between_lines(extra_content, **find_links_kwargs)
-    )
+
+    # Получаем ссылки из основного контента
     anothers_page_links = set(
         find_links_between_lines(base_content, **find_links_kwargs)
     )
+
+    # Получаем ссылки из дополнительного контента
+    user_links = set(
+        find_links_between_lines(extra_content, **find_links_kwargs)
+    )
+
+    # Выводим отладочную информацию
+    print("\n=== ССЫЛКИ У ВЛАДЕЛЬЦА ===")
+    for link in sorted(user_links):
+        print(f"  - {link}")
+
+    print("\n=== ССЫЛКИ У ДРУГОГО ===")
+    for link in sorted(anothers_page_links):
+        print(f"  - {link}")
+
+    # Находим уникальные ссылки (есть у пользователя, но нет на другой странице)
     diff_urls = [
         x.get("href")
         for x in (user_links - anothers_page_links)
         if x.get("href") not in ignore_urls
     ]
+
     return diff_urls
 
 

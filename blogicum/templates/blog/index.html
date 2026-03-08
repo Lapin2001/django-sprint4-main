@@ -18,12 +18,7 @@
                 <p class="card-text">{{ post.text|truncatechars:200 }}</p>
                 <div class="d-flex justify-content-between align-items-center">
                     <small class="text-muted">
-        <small>
-            <a href="{% url 'blog:post_detail' post_id=post.id %}#comments" class="text-decoration-none">
-                Комментарии ({{ post.comments.count }})
-            </a>
-        </small>
-                        <a href="{% url 'blog:profile' username=post.author.username %}" class="text-decoration-none">
+                        <a href="{% url 'blog:profile' post.author.username %}" class="text-decoration-none">
                             {{ post.author.username }}
                         </a> • {{ post.pub_date|date:"d E Y, H:i" }}
                     </small>
@@ -31,12 +26,15 @@
                 </div>
                 <div class="mt-2">
                     <span class="text-muted">
-                        <i class="bi bi-chat"></i> {{ post.comment_count }} комментариев
+                        <i class="bi bi-chat"></i> 
+                        <a href="{% url 'blog:post_detail' post.id %}#comments" class="text-decoration-none">
+                            Комментарии ({{ post.comments.count }})
+                        </a>
                     </span>
                 </div>
             </div>
             <div class="card-footer bg-transparent border-top-0">
-                <a href="{% url 'blog:post_detail' post_id=post.id %}" class="btn btn-outline-primary btn-sm">
+                <a href="{% url 'blog:post_detail' post.id %}" class="btn btn-outline-primary btn-sm">
                     Читать полностью
                 </a>
             </div>

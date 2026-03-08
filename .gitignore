@@ -28,3 +28,9 @@ sent_emails/
 *.swo
 *~
 .DS_Store
+
+# Тесты и временные файлы
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
