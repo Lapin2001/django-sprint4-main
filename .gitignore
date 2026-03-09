@@ -5,11 +5,13 @@ __pycache__/
 venv/
 env/
 ENV/
+.venv
 *.log
 *.pot
 *.pyc
 db.sqlite3
 media/
+sent_emails/
 
 # Django
 *.log
@@ -34,3 +36,8 @@ sent_emails/
 htmlcov/
 .pytest_cache/
 .tox/
+.mypy_cache/
+
+# Project specific
+blogicum.zip
+*.bak
