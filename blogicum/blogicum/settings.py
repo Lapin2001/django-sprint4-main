@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_bootstrap5',
+    # 'django_extensions',
     'blog.apps.BlogConfig',
     'pages',
     'users',
@@ -111,3 +112,5 @@ POSTS_PER_PAGE = 10
 
 # Login URL settings
 LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'

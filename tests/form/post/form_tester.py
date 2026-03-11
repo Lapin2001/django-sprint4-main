@@ -15,27 +15,11 @@ class PostFormTester(BaseFormTester):
         return True
 
     @staticmethod
-    @staticmethod
     def init_create_item_form(Form: Type[BaseForm], **form_data) -> BaseForm:
         image_data = BytesIO()
         Image.new("RGB", (100, 100)).save(image_data, "JPEG")
         image_data.seek(0)
         from blog.models import Post
-    
-        files = {
-            PostModelAdapter(Post).get_student_field_name(
-                "image"
-            ): SimpleUploadedFile(
-                "test_image.jpg", image_data.read(), content_type="image/jpeg"
-            ),
-        }
-    
-        # Создаем экземпляр формы с данными и файлами
-        return Form(form_data, files)
-        image_data = BytesIO()
-        Image.new("RGB", (100, 100)).save(image_data, "JPEG")
-        image_data.seek(0)
-        from blog.models import Post
 
         files = {
             PostModelAdapter(Post).get_student_field_name(
@@ -45,7 +29,7 @@ class PostFormTester(BaseFormTester):
             ),
         }
 
-        result = Form(form_data, files)
+        result = Form(data=form_data, files=files)
         return result
 
     @staticmethod

@@ -92,6 +92,89 @@ def test_custom_err_handlers(client):
 
 
 @pytest.mark.django_db
+def test_profile(
+        user, another_user, user_client, another_user_client, unlogged_client
+):
+    user_url = f"/profile/{user.username}/"
+    printed_url = "/profile/<username>/"
+
+    User = get_user_model()
+    status_code_not_404_err_msg = (
+        "Убедитесь, что при обращении к странице несуществующего "
+        "пользователя возвращается статус 404."
+    )
+    try:
+        response = user_client.get("/profile/this_is_unexisting_user_name/")
+    except User.DoesNotExist:
+        raise AssertionError(status_code_not_404_err_msg)
+
+    assert response.status_code == HTTPStatus.NOT_FOUND, (
+        status_code_not_404_err_msg)
+
+    user_response: HttpResponse = user_client.get(user_url)
+
+    user_content = user_response.content.decode("utf-8")
+
+    anothers_same_page_response: HttpResponse = another_user_client.get(
+        user_url
+    )
+    anothers_same_page_content = anothers_same_page_response.content.decode(
+        "utf-8"
+    )
+
+    unlogged_same_page_response: HttpResponse = unlogged_client.get(user_url)
+    unlogged_same_page_content = unlogged_same_page_response.content.decode(
+        "utf-8"
+    )
+
+    for profile_user, profile_user_content in (
+            (user, user_content),
+            (user, unlogged_same_page_content),
+            (user, anothers_same_page_content),
+    ):
+        _test_user_info_displayed(
+            profile_user, profile_user_content, printed_url
+        )
+
+    try:
+        edit_url, change_pwd_url = try_get_profile_manage_urls(
+            user_content, anothers_same_page_content, ignore_urls={user_url}
+        )
+    except ManageProfileLinksException:
+        raise AssertionError(
+            "Убедитесь, что на странице профиля пользователя ссылки для"
+            " редактирования профиля и изменения пароля видны только владельцу"
+            " профиля, но не другим пользователям."
+        )
+
+    unlogged_diff_urls = get_extra_urls(
+        base_content=unlogged_same_page_content, extra_content=user_content
+    )
+
+    assert {edit_url, change_pwd_url}.issubset(set(unlogged_diff_urls)), (
+        "Убедитесь, что неаутентифицированному пользователю недоступны ссылки"
+        " для редактирования профиля и изменения пароля."
+    )
+
+    item_to_edit = user
+    item_to_edit_adapter = UserModelAdapter(item_to_edit)
+    old_prop_value = item_to_edit_adapter.displayed_field_name_or_value
+    update_props = {
+        item_to_edit_adapter.item_cls_adapter.displayed_field_name_or_value: (
+            f"{old_prop_value} edited"
+        )
+    }
+    _test_edit(
+        KeyVal(edit_url, edit_url),
+        UserModelAdapter,
+        user,
+        EditFormTester=EditUserFormTester,
+        user_client=user_client,
+        unlogged_client=unlogged_client,
+        **update_props,
+    )
+
+
 def _test_user_info_displayed(
         profile_user: Model, profile_user_content: str, printed_url: str
 ) -> None:
@@ -141,68 +224,15 @@ def get_extra_urls(
     find_links_kwargs = dict(
         urls_start_with="", start_lineix=-1, end_lineix=-1
     )
-
-    # Получаем ссылки из основного контента
-    anothers_page_links = set(
-        find_links_between_lines(base_content, **find_links_kwargs)
-    )
-
-    # Получаем ссылки из дополнительного контента
     user_links = set(
         find_links_between_lines(extra_content, **find_links_kwargs)
     )
-
-    # Выводим отладочную информацию
-    print("\n=== ССЫЛКИ У ВЛАДЕЛЬЦА ===")
-    for link in sorted(user_links):
-        print(f"  - {link}")
-
-    print("\n=== ССЫЛКИ У ДРУГОГО ===")
-    for link in sorted(anothers_page_links):
-        print(f"  - {link}")
-
-    # Находим уникальные ссылки (есть у пользователя, но нет на другой странице)
+    anothers_page_links = set(
+        find_links_between_lines(base_content, **find_links_kwargs)
+    )
     diff_urls = [
         x.get("href")
         for x in (user_links - anothers_page_links)
         if x.get("href") not in ignore_urls
     ]
-
     return diff_urls
-
-
-@pytest.mark.django_db
-
-@pytest.mark.django_db
-def test_profile(
-        user, another_user, user_client, another_user_client, unlogged_client
-):
-    """Исправленная версия теста профиля"""
-    user_url = f"/profile/{user.username}/"
-    
-    # Получаем страницы
-    user_response = user_client.get(user_url)
-    user_content = user_response.content.decode()
-    
-    another_response = another_user_client.get(user_url)
-    another_content = another_response.content.decode()
-    
-    # Найдем все ссылки вручную
-    import re
-    user_links = set(re.findall(r'href="([^"]+)"', user_content))
-    print("\n=== ССЫЛКИ У ВЛАДЕЛЬЦА ===")
-    for link in sorted(user_links):
-        print(f"  - {link}")
-    print("\n=== ССЫЛКИ У ДРУГОГО ===")
-    for link in sorted(another_links):
-        print(f"  - {link}")
-    another_links = set(re.findall(r'href="([^"]+)"', another_content))
-    
-    # Ссылки для редактирования
-    edit_links = {'/users/profile/edit/', '/users/password/change/'}
-    
-    # Проверяем, что у владельца они есть
-    assert edit_links.issubset(user_links), "У владельца нет всех ссылок"
-    
-    # Проверяем, что у другого их нет
-    assert not edit_links.intersection(another_links), "У другого пользователя есть ссылки"

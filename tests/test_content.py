@@ -546,17 +546,6 @@ class TestContent:
 
     def test_image_visible(self, user_client, post_with_published_location):
         post = post_with_published_location
-        print(f"\n=== DEBUG ===\nPost image: {post.image}")
-        if post.image:
-            print(f"Image URL: {post.image.url}")
-            print(f"Image path: {post.image.path}")
-            from django.conf import settings
-            print(f"MEDIA_URL: {settings.MEDIA_URL}")
-            print(f"MEDIA_ROOT: {settings.MEDIA_ROOT}")
-        else:
-            print("No image attached to post")
-        print("=== END DEBUG ===\n")
-
         post_adapter = PostModelAdapter(post)
 
         testers: List[PostContentTester] = [
@@ -567,15 +556,6 @@ class TestContent:
         img_n_with_post_img = {}
 
         for i, tester in enumerate(testers):
-            print(f"\n>>> Тестируем страницу: {tester.__class__.__name__}")
-            response_content = tester.user_client_testget().content.decode("utf-8")
-            print("Первые 500 символов ответа:")
-            print(response_content[:500])
-            print("\n>>> Поиск тегов img...")
-            img_soup_with_post_img = BeautifulSoup(response_content, "html.parser", parse_only=SoupStrainer("img"))
-            print(f"Найдено тегов img: {len(img_soup_with_post_img)}")
-            for img_tag in img_soup_with_post_img.find_all("img")[:3]:
-                print(f"  - src: {img_tag.get('src', 'НЕТ src')}")
             img_soup_with_post_img = BeautifulSoup(
                 tester.user_client_testget().content.decode("utf-8"),
                 features="html.parser",
@@ -596,14 +576,3 @@ class TestContent:
             assert (
                 img_n_with_post_img[i] - img_n_without_post_img
             ) == 1, tester.image_display_error
-
-        print(f"\nТестируем {tester.__class__.__name__}")
-        response = tester.user_client_testget()
-        print(f"URL: {response.request['PATH_INFO']}")
-        print(f"Status: {response.status_code}")
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.content, "html.parser")
-            all_imgs = soup.find_all("img")
-            print(f"Всего img на странице: {len(all_imgs)}")
-            for idx, img in enumerate(all_imgs[:3]):
-                print(f"  img {idx}: {img.get('src', 'нет src')}")

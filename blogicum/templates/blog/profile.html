@@ -19,10 +19,10 @@
           
           {% if user == profile_user %}
           <div class="mt-3">
-            <a href="{% url 'blog:edit_profile' %}" class="btn btn-outline-primary">
+            <a href="/users/profile/edit/" class="btn btn-outline-primary">
               Редактировать профиль
             </a>
-            <a href="{% url 'password_change' %}" class="btn btn-outline-warning">
+            <a href="/users/password/change/" class="btn btn-outline-warning">
               Изменить пароль
             </a>
           </div>

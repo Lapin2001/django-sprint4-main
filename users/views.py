@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404  # noqa: F401
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # noqa: F401
 from django.contrib.auth.forms import PasswordChangeForm
 from .forms import CustomUserCreationForm, CustomUserChangeForm
+
 
 def registration(request):
     """Регистрация нового пользователя."""
@@ -15,8 +16,9 @@ def registration(request):
             return redirect('blog:profile', username=user.username)
     else:
         form = CustomUserCreationForm()
-    
+
     return render(request, 'users/registration.html', {'form': form})
+
 
 @login_required
 def profile_edit(request):
@@ -28,8 +30,9 @@ def profile_edit(request):
             return redirect('blog:profile', username=request.user.username)
     else:
         form = CustomUserChangeForm(instance=request.user)
-    
+
     return render(request, 'users/profile_edit.html', {'form': form})
+
 
 @login_required
 def password_change(request):
@@ -42,5 +45,11 @@ def password_change(request):
             return redirect('users:password_change_done')
     else:
         form = PasswordChangeForm(request.user)
-    
+
     return render(request, 'users/password_change.html', {'form': form})
+
+
+@login_required
+def password_change_done(request):
+    """Страница успешного изменения пароля"""
+    return render(request, 'users/password_change_done.html')

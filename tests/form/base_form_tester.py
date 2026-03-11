@@ -240,16 +240,8 @@ class BaseFormTester(BaseTester):
         return response, created
 
     @staticmethod
-    @staticmethod
     def init_create_item_form(Form: Type[BaseForm], **form_data) -> BaseForm:
-        # Создаем экземпляр формы с данными
-        return Form(form_data)
-        return Form(form_data)
-
-    @staticmethod
-    def init_create_item_form(Form: Type[BaseForm], **form_data) -> BaseForm:
-        # Создаем экземпляр формы с данными
-        return Form(form_data)
+        return Form(data=form_data)
 
     def init_create_item_forms(
         self,
@@ -259,6 +251,7 @@ class BaseFormTester(BaseTester):
         forms_unadapted_data: Iterable[Dict[str, Any]],
     ) -> List[BaseForm]:
         creation_forms = []
+
         model_adapter = ModelAdapter(Model)
         for unadapted_form_data in forms_unadapted_data:
             adapted_form_data = {}
@@ -267,6 +260,7 @@ class BaseFormTester(BaseTester):
             creation_forms.append(
                 self.init_create_item_form(Form, **adapted_form_data)
             )
+
         return creation_forms
 
     def test_unlogged_cannot_create(
@@ -368,7 +362,7 @@ class BaseFormTester(BaseTester):
             for k in file_data:
                 del form_data[k]
 
-        result = Form(form_data, files=file_data)
+        result = Form(data=form_data, files=file_data)
         return result
 
     @abstractmethod

@@ -15,7 +15,8 @@ from django.utils import timezone
 from adapters.post import PostModelAdapter
 from conftest import _TestModelAttrs, KeyVal, get_a_post_get_response_safely
 from fixtures.types import CommentModelAdapterT
-from form.base_form_tester import FormValidationException, AuthorisedSubmitTester
+from form.base_form_tester import (
+    FormValidationException, AuthorisedSubmitTester)
 from form.comment.create_form_tester import CreateCommentFormTester
 from form.comment.delete_tester import DeleteCommentTester
 from form.comment.edit_form_tester import EditCommentFormTester
