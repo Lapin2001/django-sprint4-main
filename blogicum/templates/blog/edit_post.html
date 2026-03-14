@@ -15,9 +15,15 @@
             <button type="submit" class="btn btn-primary">
               Сохранить
             </button>
-            <a href="{% url 'blog:post_detail' post.id %}" class="btn btn-secondary">
-              Отмена
-            </a>
+            {% if post and post.id %}
+              <a href="{% url 'blog:post_detail' post.id %}" class="btn btn-secondary">
+                Отмена
+              </a>
+            {% else %}
+              <a href="{% url 'blog:index' %}" class="btn btn-secondary">
+                Отмена
+              </a>
+            {% endif %}
           </form>
         </div>
       </div>

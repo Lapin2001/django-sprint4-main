@@ -19,10 +19,11 @@
           
           {% if user == profile_user %}
           <div class="mt-3">
-            <a href="/users/profile/edit/" class="btn btn-outline-primary">
+            <a href="{% url 'users:profile_edit' %}" class="btn btn-outline-primary">
               Редактировать профиль
             </a>
-            <a href="/users/password/change/" class="btn btn-outline-warning">
+            <!-- ИЗМЕНЕНО: используем password_change без пространства имен -->
+            <a href="{% url 'password_change' %}" class="btn btn-outline-warning">
               Изменить пароль
             </a>
           </div>
@@ -34,14 +35,6 @@
     <div class="col-md-8">
       <h3>Публикации пользователя</h3>
       
-      {% if user == profile_user %}
-      <div class="mb-3">
-        <a href="{% url 'blog:post_create' %}" class="btn btn-primary">
-          Новая публикация
-        </a>
-      </div>
-      {% endif %}
-      
       {% if page_obj %}
         {% for post in page_obj %}
           <div class="card mb-3">
@@ -52,7 +45,6 @@
               <h5 class="card-title">{{ post.title }}</h5>
               <p class="card-text">{{ post.text|truncatechars:200 }}</p>
               
-              <!-- Добавлена информация о комментариях -->
               <p class="text-muted">
                 <i class="bi bi-chat"></i> 
                 <a href="{% url 'blog:post_detail' post.id %}#comments" class="text-decoration-none">
@@ -74,7 +66,7 @@
       {% else %}
         <div class="alert alert-info" role="alert">
           {% if user == profile_user %}
-            У вас пока нет публикаций. <a href="{% url 'blog:post_create' %}">Создайте первую!</a>
+            У вас пока нет публикаций.
           {% else %}
             У этого пользователя пока нет публикаций.
           {% endif %}
