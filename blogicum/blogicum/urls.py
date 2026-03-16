@@ -2,13 +2,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from users import views
 
 urlpatterns = [
+    path("auth/registration/", views.registration, name="registration"),
     path('admin/', admin.site.urls),
     path('', include('blog.urls', namespace='blog')),
     path('pages/', include('pages.urls', namespace='pages')),
     path('auth/', include('django.contrib.auth.urls')),
-    path('users/', include('users.urls')),  # ← Добавьте эту строку!
+    path('users/', include('users.urls')),
 ]
 
 if settings.DEBUG:
@@ -21,5 +23,14 @@ if settings.DEBUG:
         document_root=settings.STATIC_ROOT
     )
 
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )
+
+    urlpatterns += static(
+        settings.STATIC_URL,
+        document_root=settings.STATIC_ROOT
+    )
 handler500 = 'pages.views.server_error'
 handler404 = 'pages.views.page_not_found'

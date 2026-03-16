@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление записи - Блогикум{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Удаление записи</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Вы уверены, что хотите удалить запись?</h5>
+                <p class="card-text">
+                    <strong>"{{ post.title }}"</strong><br>
+                    <small class="text-muted">
+                        Создана: {{ post.created_at|date:"d E Y H:i" }}<br>
+                        Автор: {{ post.author.username }}
+                    </small>
+                </p>
+                
+                <div class="alert alert-warning">
+                    <strong>Внимание!</strong> Это действие нельзя отменить. Все комментарии к этой записи также будут удалены.
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger">Да, удалить</button>
+                        <a href="{% url 'blog:post_detail' post.id %}" class="btn btn-secondary">Нет, отмена</a>
+                        <a href="{% url 'blog:index' %}" class="btn btn-outline-secondary ms-auto">На главную</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
@@ -10,7 +11,7 @@ from .models import Category, Comment, Post
 
 def index(request):
     # Добавляем аннотацию с количеством комментариев
-    post_list = Post.objects.filter(
+    post_list = Post.objects.filter(pub_date__lte=timezone.now(), 
         is_published=True,
         category__is_published=True  # Добавьте эту фильтрацию
     ).annotate(
@@ -46,7 +47,7 @@ def post_detail(request, post_id):
 
 def category_posts(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug, is_published=True)
-    post_list = Post.objects.filter(
+    post_list = Post.objects.filter(pub_date__lte=timezone.now(), 
         category=category, 
         is_published=True
     ).annotate(
@@ -61,26 +62,31 @@ def category_posts(request, category_slug):
 
 def profile(request, username):
     user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=user).annotate(
-        comment_count=Count('comments')  # Добавляем аннотацию
-    ).order_by('-pub_date')
+    
+    # Автор видит все свои посты (включая отложенные и неопубликованные)
+    if request.user == user:
+        posts = Post.objects.filter(author=user).annotate(
+            comment_count=Count('comments')
+        ).order_by('-pub_date')
+    else:
+        # Другие пользователи видят только опубликованные
+        posts = Post.objects.filter(
+            author=user,
+            pub_date__lte=timezone.now(),
+            is_published=True,
+            category__is_published=True
+        ).annotate(
+            comment_count=Count('comments')
+        ).order_by('-pub_date')
 
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'blog/profile.html', {
-        'profile': user,
+        'profile_user': user,
         'page_obj': page_obj
     })
 
-
-@login_required
-def profile_edit(request):
-    # Ваша существующая функция
-    pass
-
-
-@login_required
 def post_create(request):
     """Создание нового поста."""
     if request.method == 'POST':
